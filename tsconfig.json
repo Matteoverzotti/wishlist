@@ -15,18 +15,18 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./frontend/*"],
-      "@/components/*": ["./frontend/js/Components/*"],
-      "@/pages/*": ["./frontend/js/Pages/*"],
-      "@/types/*": ["./frontend/types/*"]
+      "@/*": ["./resources/*"],
+      "@/components/*": ["./resources/js/Components/*"],
+      "@/pages/*": ["./resources/js/Pages/*"],
+      "@/types/*": ["./resources/types/*"]
     },
     "types": ["vite/client"]
   },
   "include": [
-    "frontend/**/*.ts",
-    "frontend/**/*.tsx",
-    "frontend/**/*.js",
-    "frontend/**/*.jsx",
+    "resources/**/*.ts",
+    "resources/**/*.tsx",
+    "resources/**/*.js",
+    "resources/**/*.jsx",
     "vite.config.ts",
     "resources/**/*.ts",
     "resources/**/*.tsx"

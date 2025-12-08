@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { PageProps } from '../types';
 
 const appName: string = import.meta.env.VITE_APP_NAME || 'Bucharest Map';
 

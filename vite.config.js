@@ -20,7 +20,7 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['frontend/css/app.css', 'frontend/js/app.tsx'],
+            input: ['resources/css/app.css', 'resources/js/app.tsx'],
             refresh: true,
             detectTls: false,
         }),

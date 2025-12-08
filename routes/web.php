@@ -1,23 +1,25 @@
 <?php
 
-use App\Http\Controllers\ZileSiNopti\ZileSiNoptiScraperController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    Log::info('Welcome page visited');
-    return Inertia::render('Welcome', [
-        'appName' => config('app.name'),
-        'locations' => [
-            ['id' => 1, 'name' => 'Old Town (Centrul Vechi)', 'lat' => 44.4268, 'lng' => 26.1025, 'description' => 'Historic center of Bucharest'],
-            ['id' => 2, 'name' => 'Palace of Parliament', 'lat' => 44.4276, 'lng' => 26.0876, 'description' => 'World\'s largest administrative building'],
-            ['id' => 3, 'name' => 'Herastrau Park', 'lat' => 44.4672, 'lng' => 26.0735, 'description' => 'Large park in northern Bucharest'],
-            ['id' => 4, 'name' => 'Arcul de Triumf', 'lat' => 44.4669, 'lng' => 26.0786, 'description' => 'Triumphal arch monument'],
-        ]
-    ]);
+// Wishlist Authentication Routes
+Route::get('/', [AuthController::class, 'showAccessPage'])->name('wishlist.access');
+Route::post('/access', [AuthController::class, 'verifyAccess'])->name('wishlist.verify');
+Route::get('/select-user', [AuthController::class, 'showSelectUser'])->name('wishlist.selectUser');
+Route::post('/select-user', [AuthController::class, 'selectUser'])->name('wishlist.selectUserPost');
+Route::post('/create-user', [AuthController::class, 'createUser'])->name('wishlist.createUser');
+Route::post('/logout', [AuthController::class, 'logout'])->name('wishlist.logout');
+
+// Protected Wishlist Routes
+Route::middleware([\App\Http\Middleware\CheckWishlistAuth::class])->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/items', [WishlistController::class, 'addItem'])->name('wishlist.addItem');
+    Route::delete('/wishlist/items/{item}', [WishlistController::class, 'deleteItem'])->name('wishlist.deleteItem');
+    Route::patch('/wishlist/items/{item}/status', [WishlistController::class, 'updateItemStatus'])->name('wishlist.updateStatus');
 });
 
 Route::get('/health', function () {
