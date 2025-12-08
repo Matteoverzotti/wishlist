@@ -14,7 +14,7 @@ export default function Access() {
                         <p className="text-gray-600 text-lg">Introdu parola de acces</p>
                     </div>
 
-                    <Form action="/access" method="POST">
+                    <Form action={"/access"} method="POST">
                         {({
                               errors,
                               processing,
@@ -40,8 +40,7 @@ export default function Access() {
                                     Enter
                                 </button>
                             </>
-                        )
-                        }
+                        )}
                     </Form>
                 </div>
             </div>
