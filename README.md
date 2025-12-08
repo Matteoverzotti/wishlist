@@ -99,38 +99,108 @@ cd laravel-docker-examples
 
 ### Setting Up the Development Environment
 
-1. Copy the .env.example file to .env and adjust any necessary environment variables:
+#### First Time Setup
+
+1. **Copy the environment file:**
 
 ```bash
 cp .env.example .env
 ```
 
-Hint: adjust the `UID` and `GID` variables in the `.env` file to match your user ID and group ID. You can find these by running `id -u` and `id -g` in the terminal.
+**Important:** Adjust the `UID` and `GID` variables in the `.env` file to match your user ID and group ID. You can find these by running:
 
-2. Start the Docker Compose Services:
+```bash
+id -u  # Your user ID
+id -g  # Your group ID
+```
+
+2. **Start the Docker containers:**
 
 ```bash
 docker compose -f compose.dev.yaml up -d
 ```
 
-3. Install Laravel Dependencies:
+3. **Access the workspace container and install dependencies:**
 
 ```bash
 docker compose -f compose.dev.yaml exec workspace bash
-composer install
-npm install
-npm run dev
 ```
 
-4. Run Migrations:
+Once inside the container, run:
+
+```bash
+composer install
+npm install
+exit
+```
+
+4. **Restart containers to load environment variables:**
+
+After editing the `.env` file, restart the containers to ensure all environment variables are properly loaded:
+
+```bash
+docker compose -f compose.dev.yaml down
+docker compose -f compose.dev.yaml up -d
+```
+
+5. **Generate application key:**
+
+```bash
+docker compose -f compose.dev.yaml exec workspace php artisan key:generate
+```
+
+If you encounter issues, manually set `APP_KEY=` (empty) in your `.env` file and run the command again.
+
+6. **Run database migrations:**
 
 ```bash
 docker compose -f compose.dev.yaml exec workspace php artisan migrate
 ```
 
-5. Access the Application:
+7. **Start Vite development server (in a separate terminal):**
+
+```bash
+docker compose -f compose.dev.yaml exec workspace bash -c '. ~/.nvm/nvm.sh && npm run dev'
+```
+
+Keep this terminal running to enable hot module replacement (HMR) for frontend assets.
+
+8. **Access the application:**
 
 Open your browser and navigate to [http://localhost](http://localhost).
+
+#### Subsequent Runs
+
+For daily development after the initial setup:
+
+1. **Start the Docker containers:**
+
+```bash
+docker compose -f compose.dev.yaml up -d
+```
+
+2. **Start Vite development server:**
+
+```bash
+docker compose -f compose.dev.yaml exec workspace bash -c '. ~/.nvm/nvm.sh && npm run dev'
+```
+
+Keep this running in a separate terminal while developing to enable hot reloading of frontend assets.
+
+3. **Access the application:**
+
+Open your browser and navigate to [http://localhost](http://localhost).
+
+#### Stopping the Development Environment
+
+When you're done developing:
+
+1. Stop Vite (press `Ctrl+C` in the terminal where `npm run dev` is running)
+2. Stop Docker containers:
+
+```bash
+docker compose -f compose.dev.yaml down
+```
 
 ## Usage
 
