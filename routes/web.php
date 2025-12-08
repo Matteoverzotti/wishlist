@@ -20,8 +20,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/crawl', ZileSiNoptiScraperController::class);
-
 Route::get('/health', function () {
     $status = [];
 
