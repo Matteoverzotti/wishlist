@@ -14,7 +14,7 @@ export default function Access() {
                         <p className="text-gray-600 text-lg">Introdu parola de acces</p>
                     </div>
 
-                    <Form action={"/access"} method="POST">
+                    <Form action={route("wishlist.verify")} method="POST">
                         {({
                               errors,
                               processing,

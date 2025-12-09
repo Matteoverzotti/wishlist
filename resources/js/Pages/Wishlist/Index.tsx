@@ -1,5 +1,5 @@
-import React, { useState, FormEvent } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import React, {useState, FormEvent} from 'react';
+import {Head, useForm, router, Link, Form} from '@inertiajs/react';
 
 interface Item {
     id: number;
@@ -21,7 +21,7 @@ interface Props {
     users: User[];
 }
 
-export default function Index({ currentUser, users }: Props) {
+export default function Index({currentUser, users}: Props) {
     const [showAddItem, setShowAddItem] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
@@ -48,22 +48,18 @@ export default function Index({ currentUser, users }: Props) {
     }
 
     function handleStatusChange(itemId: number, status: 'planning' | 'bought' | 'none') {
-        router.patch(route('wishlist.updateStatus', itemId), { status });
-    }
-
-    function handleLogout() {
-        router.post(route('wishlist.logout'));
+        router.patch(route('wishlist.updateStatus', itemId), {status});
     }
 
     const currentUserData = users.find(u => u.id === currentUser.id);
     const otherUsers = users.filter(u => u.id !== currentUser.id);
-    const displayUser = selectedUserId 
+    const displayUser = selectedUserId
         ? users.find(u => u.id === selectedUserId)
         : currentUserData;
 
     return (
         <>
-            <Head title="My Wishlist" />
+            <Head title="Lista mea"/>
             <div className="min-h-screen bg-gradient-to-br from-red-50 to-green-50 p-4 md:p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
@@ -71,24 +67,21 @@ export default function Index({ currentUser, users }: Props) {
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-800">
-                                    🎄 Hello, {currentUser.name}!
+                                    🎄 Bună, {currentUser.name}!
                                 </h1>
                                 <p className="text-gray-600 text-lg mt-1">
-                                    {selectedUserId ? "Viewing someone's wishlist" : "Your wishlist"}
+                                    {selectedUserId ? "Vizualizezi lista altcuiva" : "Lista ta de dorințe pentru Crăciun"}
                                 </p>
                             </div>
-                            <button
-                                onClick={handleLogout}
-                                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg text-lg transition-colors"
-                            >
-                                Switch User
-                            </button>
+                            <Link href={"/logout"} className=" bg-gray-300
+                                  hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg text-lg
+                                  transition-colors" method="post" as="button">Deconectează-te</Link>
                         </div>
                     </div>
 
                     {/* User Selection */}
                     <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">View Wishlist</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Selectează lista de cadouri</h2>
                         <div className="flex flex-wrap gap-3">
                             <button
                                 onClick={() => setSelectedUserId(null)}
@@ -98,7 +91,7 @@ export default function Index({ currentUser, users }: Props) {
                                         : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                                 }`}
                             >
-                                My List
+                                Lista mea
                             </button>
                             {otherUsers.map(user => (
                                 <button
@@ -120,58 +113,69 @@ export default function Index({ currentUser, users }: Props) {
                     <div className="bg-white rounded-2xl shadow-xl p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-gray-800">
-                                {selectedUserId ? `${displayUser?.name}'s Wishes` : 'My Wishes'}
+                                {selectedUserId ? `Dorințele lui ${displayUser?.name}` : 'Dorințele Tale'}
                             </h2>
                             {!selectedUserId && (
                                 <button
                                     onClick={() => setShowAddItem(!showAddItem)}
                                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
                                 >
-                                    {showAddItem ? 'Cancel' : '+ Add Item'}
+                                    {showAddItem ? 'Anulează' : '+ Adaugă Dorință'}
                                 </button>
                             )}
                         </div>
 
                         {/* Add Item Form */}
                         {showAddItem && !selectedUserId && (
-                            <form onSubmit={handleAddItem} className="mb-6 p-6 bg-blue-50 rounded-lg space-y-4">
-                                <input
-                                    type="text"
-                                    value={addForm.data.name}
-                                    onChange={e => addForm.setData('name', e.target.value)}
-                                    placeholder="Item name *"
-                                    className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                                <textarea
-                                    value={addForm.data.description}
-                                    onChange={e => addForm.setData('description', e.target.value)}
-                                    placeholder="Description (optional)"
-                                    rows={3}
-                                    className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <input
-                                    type="url"
-                                    value={addForm.data.link}
-                                    onChange={e => addForm.setData('link', e.target.value)}
-                                    placeholder="Link (optional)"
-                                    className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={addForm.processing}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors disabled:opacity-50"
-                                >
-                                    Add to My Wishlist
-                                </button>
-                            </form>
+                            <Form action={route("wishlist.addItem")} method="POST" onSubmit={handleAddItem}
+                                  className="mb-6 p-6 bg-blue-50 rounded-lg space-y-4">
+                                {({
+                                      errors,
+                                      processing,
+                                  }) => (
+                                    <>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            placeholder="Numele cadoului *"
+                                            className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            required
+                                        />
+                                        {errors.name && (
+                                            <p className="mt-2 text-red-600 text-lg">{errors.name}</p>
+                                        )}
+                                        <textarea
+                                            name="description"
+                                            placeholder="Descriere (opțional)"
+                                            rows={3}
+                                            className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <input
+                                            type="url"
+                                            name="link"
+                                            placeholder="Link (opțional)"
+                                            className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        {errors.link && (
+                                            <p className="mt-2 text-red-600 text-lg">{errors.link}</p>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors disabled:opacity-50"
+                                        >
+                                            Adaugă la lista de dorințe
+                                        </button>
+                                    </>
+                                )}
+                            </Form>
                         )}
 
                         {/* Items List */}
                         <div className="space-y-4">
                             {displayUser?.items.length === 0 ? (
                                 <p className="text-center text-gray-500 text-xl py-8">
-                                    {selectedUserId ? 'No items yet' : 'Your wishlist is empty. Add some items!'}
+                                    {selectedUserId ? 'Nicio dorință deocamdată' : 'Lista ta este goală. Adaugă ceva ce ți-ai dori!'}
                                 </p>
                             ) : (
                                 displayUser?.items.map(item => (
@@ -212,8 +216,8 @@ export default function Index({ currentUser, users }: Props) {
                                                         item.status === 'planning'
                                                             ? 'bg-yellow-500 text-white'
                                                             : item.hasStatus
-                                                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                                            : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                                : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
                                                     }`}
                                                     disabled={item.hasStatus && item.status !== 'planning'}
                                                 >
@@ -225,8 +229,8 @@ export default function Index({ currentUser, users }: Props) {
                                                         item.status === 'bought'
                                                             ? 'bg-green-600 text-white'
                                                             : item.hasStatus
-                                                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                                            : 'bg-green-100 text-green-800 hover:bg-green-200'
+                                                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                                                : 'bg-green-100 text-green-800 hover:bg-green-200'
                                                     }`}
                                                     disabled={item.hasStatus && item.status !== 'bought'}
                                                 >
