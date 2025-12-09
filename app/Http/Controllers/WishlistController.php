@@ -69,7 +69,7 @@
         public function deleteItem(WishlistItem $item)
         {
             // Verify the item belongs to the current user
-            if ($item->user_id !== session('wishlist_user_id')) {
+            if ($item->user_id !== (int)session('wishlist_user_id')) {
                 abort(403);
             }
 

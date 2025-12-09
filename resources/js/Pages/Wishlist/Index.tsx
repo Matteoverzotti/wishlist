@@ -42,7 +42,7 @@ export default function Index({currentUser, users}: Props) {
     }
 
     function handleDeleteItem(itemId: number) {
-        if (confirm('Are you sure you want to delete this item?')) {
+        if (confirm('Ești sigur că vrei să ștergi acest cadou?')) {
             router.delete(route('wishlist.deleteItem', itemId));
         }
     }
