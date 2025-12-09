@@ -116,4 +116,30 @@
 
             return back();
         }
+
+        public function updateItem(Request $request, WishlistItem $item)
+        {
+            // Verify the item belongs to the current user
+            if ($item->user_id !== (int)session('wishlist_user_id')) {
+                abort(403);
+            }
+
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'link' => 'nullable|url',
+            ], [
+                'name.required' => 'Numele cadoului este obligatoriu.',
+                'name.max' => 'Numele cadoului nu poate avea mai mult de :max caractere.',
+                'link.url' => 'Link-ul trebuie să fie un URL valid.',
+            ]);
+
+            $item->update([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'link' => $validated['link'],
+            ]);
+
+            return back();
+        }
     }

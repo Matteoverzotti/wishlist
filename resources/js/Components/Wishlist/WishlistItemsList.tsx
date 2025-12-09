@@ -26,6 +26,7 @@ export default function WishlistItemsList({
                                               onDeleteItem,
                                               onStatusChange
                                           }: WishlistItemsListProps) {
+                                            console.log('Rendering WishlistItemsList with items:', items);
     if (items.length === 0) {
         return (
             <p className="text-center text-gray-500 text-xl py-8">

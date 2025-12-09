@@ -36,9 +36,8 @@ export default function SelectUser({users}: Props) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {users.map(user => (
-                            <form onSubmit={handleSubmit}>
+                            <form key={user.id} onSubmit={handleSubmit}>
                                 <button
-                                    key={user.id}
                                     onClick={() => selectForm.setData('user_id', user.id.toString())}
                                     className="bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-6 rounded-lg text-2xl transition-colors w-full"
                                 >

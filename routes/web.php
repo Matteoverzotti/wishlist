@@ -20,6 +20,7 @@ Route::middleware([\App\Http\Middleware\CheckWishlistAuth::class])->group(functi
     Route::post('/wishlist/items', [WishlistController::class, 'addItem'])->name('wishlist.addItem');
     Route::delete('/wishlist/items/{item}', [WishlistController::class, 'deleteItem'])->name('wishlist.deleteItem');
     Route::patch('/wishlist/items/{item}/status', [WishlistController::class, 'updateItemStatus'])->name('wishlist.updateStatus');
+    Route::patch('/wishlist/items/{item}', [WishlistController::class, 'updateItem'])->name('wishlist.updateItem');
 });
 
 Route::get('/health', function () {
