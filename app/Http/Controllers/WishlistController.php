@@ -13,7 +13,7 @@
         public function index(Request $request)
         {
             $currentUser = WishlistUser::findOrFail(session('wishlist_user_id'));
-            $users = WishlistUser::with(['items.statuses'])->get();
+            $users = WishlistUser::with(['items.statuses.markedByUser'])->get();
 
             return Inertia::render('Wishlist/Index', [
                 'currentUser' => $currentUser,
@@ -32,7 +32,15 @@
                             // Don't show status for own items
                             if ($user->id !== $currentUser->id) {
                                 $data['status'] = $item->getStatusForUser($currentUser->id);
-                                $data['hasStatus'] = $item->statuses->isNotEmpty();
+
+                                // Get the status info for all users (to show who bought/wants to buy)
+                                $anyStatus = $item->statuses->first();
+                                if ($anyStatus) {
+                                    $data['statusInfo'] = [
+                                        'status' => $anyStatus->status,
+                                        'markedByUserName' => $anyStatus->markedByUser->name,
+                                    ];
+                                }
                             }
 
                             return $data;
