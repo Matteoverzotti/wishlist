@@ -65,17 +65,19 @@ export default function Index({currentUser, users}: Props) {
                     {/* Header */}
                     <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-800">
-                                    🎄 Bună, {currentUser.name}!
-                                </h1>
-                                <p className="text-gray-600 text-lg mt-1">
-                                    {selectedUserId ? "Vizualizezi lista altcuiva" : "Lista ta de dorințe pentru Crăciun"}
-                                </p>
-                            </div>
-                            <Link href={"/logout"} className=" bg-gray-300
+
+                            <h1 className="text-3xl font-bold text-gray-800">
+                                🎄 Bună, {currentUser.name}!
+                            </h1>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <p className="text-gray-600 text-lg mt-1">
+                                {selectedUserId ? "Vizualizezi lista altcuiva" : "Lista ta de dorințe pentru Crăciun"}
+                            </p>
+                            <Link href={"/select-user"} className=" bg-gray-300
                                   hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg text-lg
-                                  transition-colors" method="post" as="button">Deconectează-te</Link>
+                                  transition-colors" as="button">Schimbă utilizatorul</Link>
                         </div>
                     </div>
 
@@ -193,7 +195,7 @@ export default function Index({currentUser, users}: Props) {
                                                         rel="noopener noreferrer"
                                                         className="text-blue-600 hover:text-blue-800 text-lg underline"
                                                     >
-                                                        View Link
+                                                        Vezi link
                                                     </a>
                                                 )}
                                             </div>

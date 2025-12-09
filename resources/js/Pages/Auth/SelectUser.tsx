@@ -1,5 +1,5 @@
 import React, {useState, FormEvent} from 'react';
-import {Form, Head, useForm} from '@inertiajs/react';
+import {Form, Head, Link, useForm} from '@inertiajs/react';
 
 interface User {
     id: number;
@@ -93,6 +93,10 @@ export default function SelectUser({users}: Props) {
                         </Form>
                     )}
                 </div>
+                <Link href={"/logout"} method="post" as="button"
+                      className="fixed right-6 top-6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-4 px-6 rounded-lg text-lg transition-colors">
+                    🚪 Deconectează-te
+                </Link>
             </div>
         </>
     );
