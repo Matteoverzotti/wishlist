@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
+        
+        // Trust Cloudflare proxies
+        $middleware->trustProxies(at: '*');
 
         $middleware->alias([
             'wishlist.auth' => \App\Http\Middleware\CheckWishlistAuth::class,
