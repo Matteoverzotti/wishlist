@@ -39,10 +39,11 @@ services:
     networks:
       - laravel-production
     healthcheck:
-      test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
+      test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 10
+      start_period: 60s
     # The 'depends_on' attribute with 'condition: service_healthy' ensures that
     # this service will not start until the 'mariadb' service passes its health check.
     # This prevents the application from trying to connect to the database before it's ready.
@@ -58,19 +59,23 @@ services:
   php-cli:
     build:
       context: .
-      dockerfile: ./docker/php-cli/Dockerfile
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+      target: production
+    restart: unless-stopped
+    volumes:
+      - laravel-storage-production:/var/www/storage
     tty: true # Enables an interactive terminal
     stdin_open: true # Keeps standard input open for 'docker exec'
     env_file:
       - .env
     networks:
-      - laravel
+      - laravel-production
+    entrypoint: [ "/bin/bash" ]
+    command: [ "-c", "tail -f /dev/null" ]
 
   mariadb:
     image: mariadb:latest
     restart: unless-stopped
-    ports:
-      - "${DB_PORT:-3306}:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_DATABASE}
@@ -83,14 +88,15 @@ services:
     # Health check for MariaDB
     # -----------------------------------------------------------
     # Health checks allow Docker to determine if a service is operational.
-    # The 'mysqladmin ping' command checks if MariaDB is ready to accept connections.
+    # The 'healthcheck.sh' command is provided by MariaDB to check if it's ready.
     # This prevents dependent services from starting before the database is ready.
     # -----------------------------------------------------------
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
 networks:
   # Attach the service to the 'laravel-production' network.
