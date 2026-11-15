@@ -34,6 +34,7 @@ services:
     restart: unless-stopped
     volumes:
       - laravel-storage-production:/var/www/storage # Mount the storage volume
+      - laravel-database-production:/var/www/database # Persist the SQLite database
     env_file:
       - .env
     networks:
@@ -44,12 +45,6 @@ services:
       timeout: 5s
       retries: 10
       start_period: 60s
-    # The 'depends_on' attribute with 'condition: service_healthy' ensures that
-    # this service will not start until the 'mariadb' service passes its health check.
-    # This prevents the application from trying to connect to the database before it's ready.
-    depends_on:
-      mariadb:
-        condition: service_healthy
 
   # The 'php-cli' service provides a command-line interface for running Artisan commands and other CLI tasks.
   # -----------------------------------------------------------
@@ -64,6 +59,7 @@ services:
     restart: unless-stopped
     volumes:
       - laravel-storage-production:/var/www/storage
+      - laravel-database-production:/var/www/database
     tty: true # Enables an interactive terminal
     stdin_open: true # Keeps standard input open for 'docker exec'
     env_file:
@@ -73,39 +69,14 @@ services:
     entrypoint: [ "/bin/bash" ]
     command: [ "-c", "tail -f /dev/null" ]
 
-  mariadb:
-    image: mariadb:latest
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_USER=${DB_USERNAME}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - mariadb-data-production:/var/lib/mysql
-    networks:
-      - laravel-production
-    # Health check for MariaDB
-    # -----------------------------------------------------------
-    # Health checks allow Docker to determine if a service is operational.
-    # The 'healthcheck.sh' command is provided by MariaDB to check if it's ready.
-    # This prevents dependent services from starting before the database is ready.
-    # -----------------------------------------------------------
-    healthcheck:
-      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-
 networks:
   # Attach the service to the 'laravel-production' network.
   # -----------------------------------------------------------
   # This custom network allows all services within it to communicate using their service names as hostnames.
-  # For example, 'php-fpm' can connect to 'postgres' by using 'postgres' as the hostname.
+  # For example, Nginx can connect to PHP-FPM by using 'php-fpm' as the hostname.
   # -----------------------------------------------------------
   laravel-production:
 
 volumes:
-  mariadb-data-production:
+  laravel-database-production:
   laravel-storage-production:

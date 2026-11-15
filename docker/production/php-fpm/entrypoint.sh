@@ -15,6 +15,9 @@ fi
 # Remove storage-init directory
 rm -rf /var/www/storage-init
 
+# The database directory is a persistent volume, so initialize the file on first boot.
+touch /var/www/database/database.sqlite
+
 # Run Laravel migrations
 # -----------------------------------------------------------
 # Ensure the database schema is up to date.

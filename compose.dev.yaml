@@ -15,7 +15,7 @@ services:
       - laravel-development
     depends_on:
       php-fpm:
-        condition: service_started  # Wait for php-fpm to start
+        condition: service_healthy
 
   php-fpm:
     # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
@@ -41,9 +41,12 @@ services:
       - ./:/var/www
     networks:
       - laravel-development
-    depends_on:
-      mariadb:
-        condition: service_started  # Wait for mariadb to start
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   workspace:
    # For the workspace service, we will also create a custom image to install and setup all the necessary stuff.
@@ -70,22 +73,5 @@ services:
     networks:
       - laravel-development
 
-  mariadb:
-    image: mariadb:latest
-    ports:
-      - "${DB_PORT:-3306}:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=app
-      - MYSQL_USER=laravel
-      - MYSQL_PASSWORD=secret
-    volumes:
-      - mariadb-data-development:/var/lib/mysql
-    networks:
-      - laravel-development
-
 networks:
   laravel-development:
-
-volumes:
-  mariadb-data-development:

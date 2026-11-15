@@ -2,14 +2,8 @@ import {defineConfig} from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import path from "node:path";
 
 export default defineConfig({
-    resolve: {
-        alias: {
-            'ziggy-js': path.resolve('vendor/tightenco/ziggy/dist/vue.es.js'),
-        }
-    },
     server: {
         host: '0.0.0.0',
         port: 5173,

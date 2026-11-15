@@ -1,9 +1,14 @@
+# PHP-FPM needs the Vite manifest to render pages; Nginx serves the same built assets.
+FROM node:22-alpine AS assets
+WORKDIR /var/www
+COPY . /var/www
+RUN npm ci && npm run build
+
 # Stage 1: Build environment and Composer dependencies
 FROM php:8.4-fpm AS builder
 
-# Install system dependencies and PHP extensions required for Laravel + MySQL support
-# Some dependencies are required for PHP extensions only in the build stage
-# We don't need to install Node.js or build assets, as it was done in the Nginx image
+# Install system dependencies and PHP extensions required for Laravel + SQLite
+# Node builds assets in its own stage; this stage installs PHP dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     unzip \
@@ -14,8 +19,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libicu-dev \
     libzip-dev \
     && docker-php-ext-install -j$(nproc) \
-    pdo_mysql \
-    opcache \
     intl \
     zip \
     bcmath \
@@ -54,7 +57,9 @@ FROM php:8.4-fpm AS production
 # Install only runtime libraries needed in production
 # libfcgi-bin and procps are required for the php-fpm-healthcheck script
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     libicu-dev \
+    libsqlite3-0 \
     libzip-dev \
     libfcgi-bin \
     procps \
@@ -87,12 +92,13 @@ COPY --from=builder /usr/local/bin/docker-php-ext-* /usr/local/bin/
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Enable PHP-FPM status page by modifying zz-docker.conf with sed
-RUN sed -i '/\[www\]/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
+RUN sed -i '/^\[www\]$/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
 # Update the variables_order to include E (for ENV)
 #RUN sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' "$PHP_INI_DIR/php.ini"
 
 # Copy the application code and dependencies from the build stage
 COPY --from=builder /var/www /var/www
+COPY --from=assets /var/www/public/build /var/www/public/build
 
 # Set working directory
 WORKDIR /var/www
